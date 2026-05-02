@@ -7,3 +7,12 @@ langgraph
 notebook
 openai
 streamlit
+requests
+python-dotenv
+tmdbv3api
+pytz
+scikit-learn
+langchain-google-genai
+langchain-ollama
+langchain-openai
+langchain-groq

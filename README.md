@@ -1,91 +1,57 @@
-# Netflix_AI_Agent
-Netflix AI Agent is an intelligent assistant that recommends TV shows and movies based on a user’s mood and previous watch history.
-The system uses natural language processing (NLP) and machine learning to understand user preferences and suggest personalized Netflix content.
+# Netflix AI Agent
 
-# ✨ Key Features
+Netflix AI Agent helps users discover movies and TV shows through natural language and structured filters. The stack includes a **React + TypeScript** (Vite) frontend, **FastAPI** backend, **LangGraph** agent with **session memory** (`MemorySaver`), and **RAG** (sentence-transformers + FAISS) over `data/netflix_titles.csv`. Structured discovery uses **`GET /api/titles`** (no LLM); conversational recommendations use **`POST /api/chat`** (LLM + retrieval tools).
 
-🎭 Mood-based recommendations — Suggests shows & movies aligned with user emotions or descriptions.
+## Features
 
-📚 Watch history learning — Learns user preferences from past viewing patterns.
+- Conversational recommendations with context carried per session (checkpointer thread id).
+- Semantic search over catalog metadata via embeddings and a FAISS index.
+- API-separated filtering layer: pandas-backed catalog queries independent of the LLM path.
 
-🤖 AI-powered understanding — Uses NLP to interpret mood keywords and semantic meaning.
+## Quick start
 
-⚡ Lightweight and fast — Runs locally with pre-trained models (no API key required).
+Terminal 1 — API (from repo root):
 
-💬 Interactive interface — Simple command-line or web-based interface for user queries.
+```bash
+uv sync
+uv run uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
+```
 
-# 🧠 System Workflow
+Terminal 2 — UI:
 
-          ┌────────────────────┐
-          │  User Input (Mood) │
-          └──────────┬─────────┘
-                     │
-           +─────────▼──────────+
-           |  NLP Mood Analyzer  |
-           +─────────┬──────────+
-                     │
-          ┌──────────▼──────────┐
-          │ Watch History Model │
-          └──────────┬──────────┘
-                     │
-           +─────────▼──────────+
-           | Recommendation Core|
-           +─────────┬──────────+
-                     │
-             ┌───────▼────────┐
-             │ Recommended List│
-             └────────────────┘
+```bash
+cd frontend && npm install && npm run dev
+```
 
-# 🧩 Tech Stack
+Open the URL Vite prints (usually `http://localhost:5173`). Set at least one of `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `GROQ_API_KEY` in `.env` or your shell.
 
-Python 3.10+
+Optional: **`LLM_PROVIDER`**: `auto` (default), `openai`, `anthropic`, or `groq`.
 
-pandas, numpy — data processing
+CLI chat (same stack as `/api/chat`):
 
-scikit-learn — recommendation algorithms
+```bash
+uv run python chatbot/agent.py
+```
 
-sentence-transformers / spaCy — mood & text embedding
+## System workflow (high level)
 
-FastAPI / Streamlit (optional) — to create an interactive UI
+```
+User message → LangGraph agent → (optional) RAG tool over FAISS → LLM reply
+Browse UI   → GET /api/titles   → pandas filters on CSV (no LLM)
+```
 
-# 🧩 Core Logic
+## Tech stack
 
-Mood Understanding
+- Python 3.13+, FastAPI, LangGraph, LangChain, sentence-transformers, FAISS  
+- React, TypeScript, Vite  
+- pandas / numpy for catalog handling and EDA notebooks  
 
-Extracts emotional context using embeddings or sentiment classification.
+## Data source
 
-Maps mood → genre/theme tags (e.g., happy → comedy, sad → drama, thrill → action).
+Netflix Movies and TV Shows dataset (e.g. [Kaggle — Netflix TV Shows and Movies](https://www.kaggle.com/datasets/victorsoeiro/netflix-tv-shows-and-movies)).
 
-User Profile Modeling
+## Author
 
-Stores last N watched shows in a local JSON or database.
-
-Creates vector profile based on genres, actors, and descriptions.
-
-Recommendation Engine
-
-Combines mood tags + user vector to compute cosine similarity with Netflix catalog embeddings.
-
-Returns top-k relevant titles.
-
-# 📊 Data Source
-
-Uses Netflix Movies and TV Shows dataset (available on Kaggle):
-https://www.kaggle.com/datasets/victorsoeiro/netflix-tv-shows-and-movies
-
-# 🧪 Future Improvements
-
-🎯 Improve personalization using reinforcement learning
-
-🗣️ Add voice or chatbot interface
-
-🌐 Integrate live Netflix API (if accessible)
-
-🧬 Context-aware recommendations (time of day, recent moods, device type)
-
-# 👨‍💻 Author
-
-# Dhyey Shah
-📧 dhyeys2805@gmail.com
-🔗 linkedin.com/in/dhyeys2805
-
+**Dhyey Shah**  
+📧 dhyeys2805@gmail.com  
+🔗 [linkedin.com/in/dhyeys2805](https://linkedin.com/in/dhyeys2805)
